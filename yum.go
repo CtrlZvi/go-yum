@@ -70,7 +70,7 @@ func Info(pattern string) ([]Package, error) {
 */
 
 func Provides(pattern string) (map[string][]Package, error) {
-	out, err := exec.Command(fmt.Sprintf("yum provides -q %v", pattern)).Output()
+	out, err := exec.Command("yum", "provides", "-q", fmt.Sprintf("%v", pattern)).Output()
 	if err != nil {
 		return nil, err
 	}
