@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -62,7 +63,10 @@ func Provides(pattern string) (map[string][]Package, error) {
 				pkg.Name = tokens[0]
 				components := strings.Split(tokens[1], ":")
 				if len(components) == 2 {
-					pkg.Epoch = components[0]
+					pkg.Epoch, err = strconv.ParseInt(components[0], 10, 32)
+					if err != nil {
+						return nil, err
+					}
 					pkg.Version = components[1]
 				} else {
 					pkg.Version = components[0]

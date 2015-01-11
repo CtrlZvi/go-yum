@@ -8,7 +8,7 @@ import (
 type Package struct {
 	Name         string
 	Architecture string
-	Epoch        string
+	Epoch        int32
 	Version      string
 	Release      string
 	Size         int64
