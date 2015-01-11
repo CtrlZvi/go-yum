@@ -1,6 +1,7 @@
 package yum
 
 import (
+  "fmt"
 	"net/url"
 )
 
@@ -16,6 +17,10 @@ type Package struct {
 	URL          *url.URL
 	License      string
 	Description  string
+}
+
+func (p *Package) String() string{
+  return fmt.Sprintf("%v-%v:%v-%v.%v", p.Name, p.Epoch, p.Version, p.Release, p.Architecture)
 }
 
 /*
