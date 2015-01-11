@@ -78,20 +78,22 @@ func Provides(pattern string) (map[string][]Package, error) {
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	scanner.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		emptyLineCount := 0
-		for emptyLineCount < 0 && advance < len(data) {
-			lineAdvance, lineToken, err2 := bufio.ScanLines(data, atEOF)
+		for emptyLineCount < 3 && advance < len(data) {
+			lineAdvance, lineToken, err2 := bufio.ScanLines(data[advance:], atEOF)
 			if err2 != nil {
 				err = err2
 				return
 			}
 
-			if string(lineToken) == "\n" || string(lineToken) == "\r\n" {
+			if string(lineToken) == "" {
 				emptyLineCount += 1
 			} else {
 				emptyLineCount = 0
-			}
-			for _, b := range lineToken {
-				token = append(token, b)
+
+				for _, b := range lineToken {
+					token = append(token, b)
+				}
+				token = append(token, '\n')
 			}
 			advance += lineAdvance
 		}
@@ -109,19 +111,23 @@ func Provides(pattern string) (map[string][]Package, error) {
 			line := scanner.Text()
 
 			splitLine := strings.SplitN(line, ":", 2)
-			switch splitLine[0] {
-			case "Repo        ":
+			switch strings.Trim(splitLine[0], " ") {
+			case "Repo":
 				pkg.Repository = strings.Trim(splitLine[1], " ")
 			case "Matched from":
-			case "Filename    ":
+			case "Filename":
 				filename := strings.Trim(splitLine[1], " ")
 				pkgs[filename] = append(pkgs[filename], pkg)
 			default:
 				tokens := strings.Split(strings.Trim(splitLine[0], " "), "-")
 				pkg.Name = tokens[0]
 				components := strings.Split(tokens[1], ":")
-				pkg.Epoch = components[0]
-				pkg.Version = components[1]
+				if len(components) == 2 {
+					pkg.Epoch = components[0]
+					pkg.Version = components[1]
+				} else {
+					pkg.Version = components[0]
+				}
 				components = strings.Split(tokens[2], ".")
 				pkg.Release = strings.Join([]string{components[0], components[1]}, ".")
 				pkg.Architecture = components[2]
