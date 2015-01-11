@@ -4,70 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	// "net/url"
 	"os/exec"
-	// "strconv"
 	"strings"
 )
-
-/*
-func List(pattern string) (installed []Package, available []Package, err error) {
-  out, err := exec.Command(fmt.Sprintf("yum list %v", pattern)).Output()
-  return
-}
-
-func Info(pattern string) ([]Package, error) {
-  out, err := exec.Command(fmt.Sprintf("yum info -q %v", pattern)).Output()
-  if err != nil {
-    return nil, err
-  }
-
-  scanner := bufio.NewScanner(bytes.NewReader(out))
-  pkg := Package{}
-  for scanner.Scan() {
-    line := scanner.Text()
-    if line == "Available Packages" ||
-      line == "Installed Packages" ||
-      line == "" {
-      continue
-    }
-
-    splitLine := strings.SplitN(line, ":", 2)
-    switch splitLine[0] {
-    case "Name        ":
-      pkg.Name = splitLine[1]
-    case "Arch        ":
-      pkg.Architecture = splitLine[1]
-    case "Epoch       ":
-      pkg.Epoch = splitLine[1]
-    case "Version     ":
-      pkg.Version = splitLine[1]
-    case "Release     ":
-      pkg.Release = splitLine[1]
-    case "Size        ":
-      pieces := strings.Split(splitLine[1], " ")
-      pkg.Size, err = strconv.ParseInt(pieces[0], 10, 64)
-      switch pieces[1] {
-      case "k":
-        pkg.Size *= 1024
-      case "M":
-        pkg.Size *= 1024 * 1024
-      }
-    case "Repo        ":
-      pkg.Repository = splitLine[1]
-    case "Summary     ":
-      pkg.Summary = splitLine[1]
-    case "URL         ":
-      pkg.URL, err = url.Parse(splitLine[1])
-    case "License     ":
-      pkg.License = splitLine[1]
-    case "Description ":
-      pkg.Description = splitLine[1]
-    }
-  }
-  return nil, nil
-}
-*/
 
 func Provides(pattern string) (map[string][]Package, error) {
 	out, err := exec.Command("yum", "provides", "-q", fmt.Sprintf("%v", pattern)).Output()
