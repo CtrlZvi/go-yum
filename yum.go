@@ -47,9 +47,9 @@ func Provides(pattern string) (map[string][]Package, error) {
 		scanner := bufio.NewScanner(strings.NewReader(result))
 
 		pkg := Package{}
+		var filename string
 		for scanner.Scan() {
 			line := scanner.Text()
-			var filename string
 
 			splitLine := strings.SplitN(line, ":", 3)
 			switch strings.Trim(splitLine[0], " ") {
@@ -75,21 +75,21 @@ func Provides(pattern string) (map[string][]Package, error) {
 				pkg.Architecture = components[2]
 				pkg.Summary = strings.Trim(splitLine[1], " ")
 			}
+		}
 
-			if pkg.Repository[0] != '@' {
-				oldRepository := pkg.Repository
-				pkg.Repository = pkg.Repository[1:]
-				alreadyExists := false
-				for _, p := range pkgs[filename] {
-					if p == pkg {
-						alreadyExists = true
-					}
+		if pkg.Repository[0] != '@' {
+			oldRepository := pkg.Repository
+			pkg.Repository = pkg.Repository[1:]
+			alreadyExists := false
+			for _, p := range pkgs[filename] {
+				if p == pkg {
+					alreadyExists = true
 				}
+			}
 
-				if !alreadyExists {
-					pkg.Repository = oldRepository
-					pkgs[filename] = append(pkgs[filename], pkg)
-				}
+			if !alreadyExists {
+				pkg.Repository = oldRepository
+				pkgs[filename] = append(pkgs[filename], pkg)
 			}
 		}
 	}
