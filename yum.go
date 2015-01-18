@@ -50,7 +50,7 @@ func Provides(pattern string) (map[string][]Package, error) {
 		for scanner.Scan() {
 			line := scanner.Text()
 
-			splitLine := strings.SplitN(line, ":", 2)
+			splitLine := strings.SplitN(line, ":", 3)
 			switch strings.Trim(splitLine[0], " ") {
 			case "Repo":
 				pkg.Repository = strings.Trim(splitLine[1], " ")
@@ -62,9 +62,10 @@ func Provides(pattern string) (map[string][]Package, error) {
 				if len(splitLine) == 3 {
 					pkg.Epoch, err = strconv.ParseInt(splitLine[0], 10, 32)
 					if err != nil {
-						return nil, err
+						splitLine = []string{splitLine[0], strings.Join([]string{splitLine[1], splitLine[2]}, ":")}
+					} else {
+						splitLine = splitLine[1:]
 					}
-					splitLine = splitLine[1:]
 				}
 				tokens := strings.Split(strings.Trim(splitLine[0], " "), "-")
 				pkg.Name = tokens[0]
