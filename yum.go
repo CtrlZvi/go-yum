@@ -49,6 +49,7 @@ func Provides(pattern string) (map[string][]Package, error) {
 		pkg := Package{}
 		for scanner.Scan() {
 			line := scanner.Text()
+			var filename string
 
 			splitLine := strings.SplitN(line, ":", 3)
 			switch strings.Trim(splitLine[0], " ") {
@@ -56,8 +57,7 @@ func Provides(pattern string) (map[string][]Package, error) {
 				pkg.Repository = strings.Trim(splitLine[1], " ")
 			case "Matched from":
 			case "Filename":
-				filename := strings.Trim(splitLine[1], " ")
-				pkgs[filename] = append(pkgs[filename], pkg)
+				filename = strings.Trim(splitLine[1], " ")
 			default:
 				if len(splitLine) == 3 {
 					pkg.Epoch, err = strconv.ParseInt(splitLine[0], 10, 32)
@@ -74,6 +74,22 @@ func Provides(pattern string) (map[string][]Package, error) {
 				pkg.Release = strings.Join([]string{components[0], components[1]}, ".")
 				pkg.Architecture = components[2]
 				pkg.Summary = strings.Trim(splitLine[1], " ")
+			}
+
+			if pkg.Repository[0] != '@' {
+				oldRepository := pkg.Repository
+				pkg.Repository = pkg.Repository[1:]
+				alreadyExists := false
+				for _, p := range pkgs[filename] {
+					if p == pkg {
+						alreadyExists = true
+					}
+				}
+
+				if !alreadyExists {
+					pkg.Repository = oldRepository
+					pkgs[filename] = append(pkgs[filename], pkg)
+				}
 			}
 		}
 	}
