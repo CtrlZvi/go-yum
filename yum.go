@@ -59,19 +59,17 @@ func Provides(pattern string) (map[string][]Package, error) {
 				filename := strings.Trim(splitLine[1], " ")
 				pkgs[filename] = append(pkgs[filename], pkg)
 			default:
-				tokens := strings.Split(strings.Trim(splitLine[0], " "), "-")
-				pkg.Name = tokens[0]
-				components := strings.Split(tokens[1], ":")
-				if len(components) == 2 {
-					pkg.Epoch, err = strconv.ParseInt(components[0], 10, 32)
+				if len(splitLine) == 3 {
+					pkg.Epoch, err = strconv.ParseInt(splitLine[0], 10, 32)
 					if err != nil {
 						return nil, err
 					}
-					pkg.Version = components[1]
-				} else {
-					pkg.Version = components[0]
+					splitLine = splitLine[1:]
 				}
-				components = strings.Split(tokens[2], ".")
+				tokens := strings.Split(strings.Trim(splitLine[0], " "), "-")
+				pkg.Name = tokens[0]
+				pkg.Version = tokens[1]
+				components := strings.Split(tokens[2], ".")
 				pkg.Release = strings.Join([]string{components[0], components[1]}, ".")
 				pkg.Architecture = components[2]
 				pkg.Summary = strings.Trim(splitLine[1], " ")
